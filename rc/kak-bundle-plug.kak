@@ -75,6 +75,19 @@ def kak-bundle-plug-rep-slist-2 -params 1 %{
   eval "set -add global %arg{1} %%opt{%arg{1}}"
 } -override -hidden
 
+def kak-bundle-plug-self-preprocess-short2long -docstring %{short -> long while editing source} %{
+  try %{ exec -draft '%s' '@' 'E@-' '<ret>c' 'kak-bundle-plug-' '<esc>' }
+  try %{ exec -draft '%s' '@' 'E@_' '<ret>c' 'kak_bundle_plug_' '<esc>' }
+} -override -hidden
+def kak-bundle-plug-self-preprocess-long2short -docstring %{long -> short while editing source} %{
+  try %{ exec -draft '%s' 'kak-bundle-' 'plug-' '<ret>c' 'kak-bundle-plug-' '<esc>' }
+  try %{ exec -draft '%s' 'kak_bundle_' 'plug_' '<ret>c' 'kak_bundle_plug_' '<esc>' }
+} -override -hidden
+def kak-bundle-plug-self-preprocess-def-aliases %{
+  alias global :pp> kak-bundle-plug-self-preprocess-short2long
+  alias global :pp< kak-bundle-plug-self-preprocess-long2short
+} -override -hidden
+
 def kak-bundle-plug-dbg -params .. %{
   echo -debug -quoting kakoune -- %arg{@}
 } -override -hidden
