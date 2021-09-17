@@ -1,7 +1,11 @@
 def kak-bundle-plug -params 1.. -docstring %{
   Partially emulates plug.kak using kak-bundle
   Args: [ {URL|CMD} POST-LOAD plug]..
-    POST-LOAD: { config CFG | {demand|defer} MODNAME POST-REQUIRE }..
+    POST-LOAD: {
+      config CFG |
+      {demand|defer} MODNAME POST-REQUIRE |
+      load-path PATH
+    }
 } %{
   set global kak_bundle_plug_cmd
   kak-bundle-plug-0 %arg{@}
@@ -80,6 +84,7 @@ def kak-bundle-plug-dbg -params .. %{
 
 decl -hidden str-list kak_bundle_plug_next
 decl -hidden str-list kak_bundle_plug_cmd
+decl -hidden str      kak_bundle_plug_cmd_url
 decl -hidden str      kak_bundle_plug_cmd_config
 
 # decrease recursion by repeating code; upto N-1 useless try's at end
@@ -103,11 +108,12 @@ set global kak_bundle_plug_code_slist %{
 def kak-bundle-plug-0 -params 1.. "%opt{kak_bundle_plug_code_slist}" -override -hidden
 
 def kak-bundle-plug-1 -params 1.. %{
+  set global kak_bundle_plug_cmd_url %arg{1}
   set global kak_bundle_plug_cmd_config ''
   set global kak_bundle_plug_next
   kak-bundle-plug-shift-1_1 %arg{@}
   kak-bundle-plug-2 %opt{kak_bundle_plug_args}
-  set -add global kak_bundle_plug_cmd %arg{1} %opt{kak_bundle_plug_cmd_config}
+  set -add global kak_bundle_plug_cmd %opt{kak_bundle_plug_cmd_url} %opt{kak_bundle_plug_cmd_config}
 } -override -hidden
 
 def kak-bundle-plug-2 -params .. %{
@@ -139,6 +145,12 @@ def kak-bundle-plug-2 -params .. %{
     kak-bundle-plug-streq-orfail defer %arg{1}
     kak-bundle-plug-2-defer %arg{@}
     kak-bundle-plug-shift-1_3 %arg{@}
+    kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+
+  } catch %{ kak-bundle-plug-err-chk :::strcmp_false
+    kak-bundle-plug-streq-orfail load-path %arg{1}
+    set global kak_bundle_plug_cmd_url "ln -sf ""%arg{2}"" # %arg{2}"  # avoid stray final '"'
+    kak-bundle-plug-shift-1_2 %arg{@}
     kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk :::strcmp_false
