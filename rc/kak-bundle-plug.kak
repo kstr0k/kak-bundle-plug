@@ -82,6 +82,7 @@ decl -hidden str-list kak_bundle_plug_next
 decl -hidden str-list kak_bundle_plug_cmd
 decl -hidden str      kak_bundle_plug_cmd_config
 
+# decrease recursion by repeating code; upto N-1 useless try's at end
 set global kak_bundle_plug_code_slist %{
   try %{ kak-bundle-plug-nop-0_0 %opt{kak_bundle_plug_next} } catch %{
     kak-bundle-plug-1 %opt{kak_bundle_plug_next}
@@ -91,9 +92,9 @@ kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
 kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
 kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
 kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
+# to disallow plug with no args: add initial call to ...-1 (no try)
 set global kak_bundle_plug_code_slist %{
-  kak-bundle-plug-1 %arg{@}
-  # decrease recursion -> increase repeat limit; upto N-1 useless try's at end
+  set global kak_bundle_plug_next %arg{@}
 } %opt{kak_bundle_plug_code_slist} %{
   try %{ kak-bundle-plug-nop-0_0 %opt{kak_bundle_plug_next} } catch %{
     kak-bundle-plug-0 %opt{kak_bundle_plug_next}
