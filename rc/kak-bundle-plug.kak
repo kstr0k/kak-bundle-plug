@@ -146,15 +146,13 @@ decl -hidden str      kak_bundle_plug_cmd_config
 # decrease recursion by repeating code
 def kak-bundle-plug-stop-fail -params .. %{ fail %val{error} } -override -hidden
 set global kak_bundle_plug_code_slist %{
+  kak-bundle-plug-loop-4 kak-bundle-plug-loop-4 eval %{
   kak-bundle-plug-fail-with kak-bundle-plug-stop-fail %{
     kak-bundle-plug-nop-1_ %opt{kak_bundle_plug_next}
   }
   kak-bundle-plug-1 %opt{kak_bundle_plug_next}
+  }
 }
-kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
-kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
-kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
-kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
 # to disallow plug with no args: add initial call to ...-1 (no try)
 set global kak_bundle_plug_code_slist %{
   set global kak_bundle_plug_next %arg{@}
