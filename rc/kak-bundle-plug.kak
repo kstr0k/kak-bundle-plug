@@ -106,11 +106,11 @@ def kak-bundle-plug-streq -params 2 %{
 } -override -hidden
 
 def kak-bundle-plug-strcmp-fail -params .. -override -hidden %{ fail %val{error} }
-def kak-bundle-plug-strne-orfail -params 2 %{
-  try %{ kak-bundle-plug-strne %arg{1} %arg{2} } catch %{ fail kak-bundle-plug-strcmp-fail }
+def kak-bundle-plug-strne-orfail -params 2..3 %{
+  try %{ kak-bundle-plug-strne %arg{1} %arg{2} } catch %{ fail "kak-bundle-plug-strcmp-fail%arg{3}" }
 } -override -hidden
-def kak-bundle-plug-streq-orfail -params 2 %{
-  try %{ kak-bundle-plug-streq %arg{1} %arg{2} } catch %{ fail kak-bundle-plug-strcmp-fail }
+def kak-bundle-plug-streq-orfail -params 2..3 %{
+  try %{ kak-bundle-plug-streq %arg{1} %arg{2} } catch %{ fail "kak-bundle-plug-strcmp-fail%arg{3}" }
 } -override -hidden
 
 def kak-bundle-plug-rep-slist-2 -params 1 %{
