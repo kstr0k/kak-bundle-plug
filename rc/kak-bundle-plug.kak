@@ -21,6 +21,41 @@ decl -hidden str-list kak_bundle_plug_code_slist
 decl -hidden str-list kak_bundle_plug_args
 decl -hidden str      kak_bundle_plug_str
 
+def kak-bundle-plug-loop-2 -params .. %{
+  %arg{@}; %arg{@}
+} -override -hidden
+def kak-bundle-plug-loop-3 -params .. %{
+  %arg{@}; %arg{@}; %arg{@}
+} -override -hidden
+def kak-bundle-plug-loop-4 -params .. %{
+  kak-bundle-plug-loop-2 kak-bundle-plug-loop-2 %arg{@}
+} -override -hidden
+def kak-bundle-plug-loop-5 -params .. %{
+  kak-bundle-plug-loop-4 %arg{@}
+  %arg{@}
+} -override -hidden
+def kak-bundle-plug-loop-6 -params .. %{
+  kak-bundle-plug-loop-2 kak-bundle-plug-loop-3 %arg{@}
+} -override -hidden
+def kak-bundle-plug-loop-7 -params .. %{
+  kak-bundle-plug-loop-6 %arg{@}
+  %arg{@}
+} -override -hidden
+def kak-bundle-plug-loop-8 -params .. %{
+  kak-bundle-plug-loop-2 kak-bundle-plug-loop-4 %arg{@}
+} -override -hidden
+def kak-bundle-plug-loop-9 -params .. %{
+  kak-bundle-plug-loop-3 kak-bundle-plug-loop-3 %arg{@}
+} -override -hidden
+
+def kak-bundle-plug-rep-slist-2 -params 1 %{
+  eval "set -add global %arg{1} %%opt{%arg{1}}"
+} -override -hidden
+def kak-bundle-plug-rep-slist-3 -params 1 %{
+  kak-bundle-plug-rep-slist-2 %arg{@}
+  eval "set -add global %arg{1} %%opt{%arg{1}}"
+} -override -hidden
+
 def kak-bundle-plug-nop-0_0 -params 0   %{nop} -override -hidden
 def kak-bundle-plug-nop-1_  -params 1.. %{nop} -override -hidden
 def kak-bundle-plug-nop-1_1 -params 1   %{nop} -override -hidden
