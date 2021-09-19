@@ -18,12 +18,13 @@ def kak-bundle-plug -params 1.. -docstring %{
 decl -hidden str-list kak_bundle_plug_test_slist
 decl -hidden str-list kak_bundle_plug_slist
 decl -hidden str-list kak_bundle_plug_code_slist
+decl -hidden str-list kak_bundle_plug_args
 decl -hidden str      kak_bundle_plug_str
 
-def kak-bundle-plug-nop-0_0 -params 0 %{nop} -override -hidden
-def kak-bundle-plug-nop-1_1 -params 1 %{nop} -override -hidden
+def kak-bundle-plug-nop-0_0 -params 0   %{nop} -override -hidden
+def kak-bundle-plug-nop-1_  -params 1.. %{nop} -override -hidden
+def kak-bundle-plug-nop-1_1 -params 1   %{nop} -override -hidden
 
-decl -hidden str-list kak_bundle_plug_args
 def kak-bundle-plug-shift-1_1 -params 1.. %{
   set         global kak_bundle_plug_args %arg{@}
   set -remove global kak_bundle_plug_args %arg{1}
@@ -107,11 +108,13 @@ decl -hidden str-list kak_bundle_plug_cmd
 decl -hidden str      kak_bundle_plug_cmd_url
 decl -hidden str      kak_bundle_plug_cmd_config
 
-# decrease recursion by repeating code; upto N-1 useless try's at end
+# decrease recursion by repeating code
+def kak-bundle-plug-stop-fail -params .. %{ fail %val{error} } -override -hidden
 set global kak_bundle_plug_code_slist %{
-  try %{ kak-bundle-plug-nop-0_0 %opt{kak_bundle_plug_next} } catch %{
-    kak-bundle-plug-1 %opt{kak_bundle_plug_next}
+  kak-bundle-plug-fail-with kak-bundle-plug-stop-fail %{
+    kak-bundle-plug-nop-1_ %opt{kak_bundle_plug_next}
   }
+  kak-bundle-plug-1 %opt{kak_bundle_plug_next}
 }
 kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
 kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
@@ -120,12 +123,10 @@ kak-bundle-plug-rep-slist-2 kak_bundle_plug_code_slist
 # to disallow plug with no args: add initial call to ...-1 (no try)
 set global kak_bundle_plug_code_slist %{
   set global kak_bundle_plug_next %arg{@}
-} %opt{kak_bundle_plug_code_slist} %{
-  try %{ kak-bundle-plug-nop-0_0 %opt{kak_bundle_plug_next} } catch %{
-    kak-bundle-plug-0 %opt{kak_bundle_plug_next}
-  }
-}
-def kak-bundle-plug-0 -params 1.. "%opt{kak_bundle_plug_code_slist}" -override -hidden
+} 'try %{' %opt{kak_bundle_plug_code_slist} %{
+  kak-bundle-plug-0 %opt{kak_bundle_plug_next}
+} '} catch %{ kak-bundle-plug-err-chk kak-bundle-plug-stop-fail }'
+def kak-bundle-plug-0 -params 0.. "%opt{kak_bundle_plug_code_slist}" -override -hidden
 
 def kak-bundle-plug-1 -params 1.. %{
   set global kak_bundle_plug_cmd_url %arg{1}
