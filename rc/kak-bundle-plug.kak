@@ -21,6 +21,9 @@ decl -hidden str-list kak_bundle_plug_code_slist
 decl -hidden str-list kak_bundle_plug_args
 decl -hidden str      kak_bundle_plug_str
 
+def kak-bundle-plug-loop-1 -params .. %{
+  %arg{@}
+} -override -hidden
 def kak-bundle-plug-loop-2 -params .. %{
   %arg{@}; %arg{@}
 } -override -hidden
@@ -77,10 +80,6 @@ def kak-bundle-plug-shift-1_4 -params 4.. %{
   set -remove global kak_bundle_plug_args %arg{1} %arg{2} %arg{3} %arg{4}
 } -override -hidden
 
-def kak-bundle-plug-fail-with -params 2 %{
-  try %arg{2} catch %{ fail %arg{1} }
-} -override -hidden
-
 decl -hidden str-list kak_bundle_plug_test_err_slist
 def kak-bundle-plug-err-chk -params .. -docstring %{
   If err != arg1, calls %arg{@}
@@ -135,7 +134,6 @@ def kak-bundle-plug-dbg -params .. %{
   echo -debug -quoting kakoune -- %arg{@}
 } -override -hidden
 
-
 # implementation
 
 decl -hidden str-list kak_bundle_plug_next
@@ -143,25 +141,26 @@ decl -hidden str-list kak_bundle_plug_cmd
 decl -hidden str      kak_bundle_plug_cmd_url
 decl -hidden str      kak_bundle_plug_cmd_config
 
-# decrease recursion by repeating code
-def kak-bundle-plug-stop-fail -params .. %{ fail %val{error} } -override -hidden
-set global kak_bundle_plug_code_slist %{
-  kak-bundle-plug-loop-4 kak-bundle-plug-loop-4 eval %{
-  kak-bundle-plug-fail-with kak-bundle-plug-stop-fail %{
-    kak-bundle-plug-nop-1_ %opt{kak_bundle_plug_next}
-  }
-  kak-bundle-plug-1 %opt{kak_bundle_plug_next}
-  }
-}
-# to disallow plug with no args: add initial call to ...-1 (no try)
-set global kak_bundle_plug_code_slist %{
-  set global kak_bundle_plug_next %arg{@}
-} 'try %{' %opt{kak_bundle_plug_code_slist} %{
-  kak-bundle-plug-0 %opt{kak_bundle_plug_next}
-} '} catch %{ kak-bundle-plug-err-chk kak-bundle-plug-stop-fail }'
-def kak-bundle-plug-0 -params 0.. "%opt{kak_bundle_plug_code_slist}" -override -hidden
+def kak-bundle-plug-stop -params .. %{
+  fail %val{error}
+} -override -hidden
 
-def kak-bundle-plug-1 -params 1.. %{
+def kak-bundle-plug-0 -params .. %{
+  try %{
+    set global kak_bundle_plug_next %arg{@}
+    # decrease recursion by repeating
+    kak-bundle-plug-loop-4 kak-bundle-plug-loop-4 kak-bundle-plug-1
+    kak-bundle-plug-0 %opt{kak_bundle_plug_next}
+  } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-stop }
+} -override -hidden
+
+def kak-bundle-plug-1 -params 0 %{
+  kak-bundle-plug-1-args %opt{kak_bundle_plug_next}
+} -override -hidden
+def kak-bundle-plug-1-args -params .. %{
+  try %{ kak-bundle-plug-nop-1_ %arg{@} } catch %{
+    fail kak-bundle-plug-stop
+  }  # stop if args exhausted
   set global kak_bundle_plug_cmd_url %arg{1}
   set global kak_bundle_plug_cmd_config ''
   set global kak_bundle_plug_next
