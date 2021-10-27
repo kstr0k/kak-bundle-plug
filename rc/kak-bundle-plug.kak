@@ -21,6 +21,10 @@ decl -hidden str-list kak_bundle_plug_code_slist
 decl -hidden str-list kak_bundle_plug_args
 decl -hidden str      kak_bundle_plug_str
 
+def kak-bundle-plug-true  -params 2 %{ eval %arg{1} } -override -hidden
+def kak-bundle-plug-false -params 2 %{ eval %arg{2} } -override -hidden
+def kak-bundle-plug-if    -params 3 %{ %arg{@} } -override -hidden
+
 def kak-bundle-plug-loop-1 -params .. %{
   %arg{@}
 } -override -hidden
@@ -140,6 +144,7 @@ decl -hidden str-list kak_bundle_plug_next
 decl -hidden str-list kak_bundle_plug_cmd
 decl -hidden str      kak_bundle_plug_cmd_url
 decl -hidden str      kak_bundle_plug_cmd_config
+decl -hidden bool     kak_bundle_plug_cmd_load
 
 def kak-bundle-plug-stop -params .. %{
   fail %val{error}
@@ -161,12 +166,17 @@ def kak-bundle-plug-1-args -params .. %{
   try %{ kak-bundle-plug-nop-1_ %arg{@} } catch %{
     fail kak-bundle-plug-stop
   }  # stop if args exhausted
+  set global kak_bundle_plug_cmd_load true
   set global kak_bundle_plug_cmd_url %arg{1}
   set global kak_bundle_plug_cmd_config ''
   set global kak_bundle_plug_next
   kak-bundle-plug-shift-1_1 %arg{@}
   kak-bundle-plug-2 %opt{kak_bundle_plug_args}
-  set -add global kak_bundle_plug_cmd %opt{kak_bundle_plug_cmd_url} %opt{kak_bundle_plug_cmd_config}
+  kak-bundle-plug-if "kak-bundle-plug-%opt{kak_bundle_plug_cmd_load}" %{
+    set -add global kak_bundle_plug_cmd %opt{kak_bundle_plug_cmd_url} %opt{kak_bundle_plug_cmd_config}
+  } %{  # ELSE
+    bundle %opt{kak_bundle_plug_cmd_url}
+  }
 } -override -hidden
 
 def kak-bundle-plug-2 -params .. %{
@@ -204,6 +214,12 @@ def kak-bundle-plug-2 -params .. %{
     kak-bundle-plug-streq-orfail load-path %arg{1}
     set global kak_bundle_plug_cmd_url "ln -sf ""%arg{2}"" # %arg{2}"  # avoid stray final '"'
     kak-bundle-plug-shift-1_2 %arg{@}
+    kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+
+  } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
+    kak-bundle-plug-streq-orfail noload %arg{1}
+    set global kak_bundle_plug_cmd_load false
+    kak-bundle-plug-shift-1_1 %arg{@}
     kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
