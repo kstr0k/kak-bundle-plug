@@ -15,52 +15,76 @@ def kak-bundle-plug -params 1.. -docstring %{
 
 ## kakscript library
 
-decl -hidden str-list kak_bundle_plug_test_slist
-decl -hidden str-list kak_bundle_plug_slist
-decl -hidden str-list kak_bundle_plug_code_slist
-decl -hidden str-list kak_bundle_plug_args
 decl -hidden str      kak_bundle_plug_str
+decl -hidden str-list kak_bundle_plug_slist
+decl -hidden str-list kak_bundle_plug_test_slist
+decl -hidden str-list kak_bundle_plug_code_slist
+decl -hidden str      kak_bundle_plug_code_str
+decl -hidden str-list kak_bundle_plug_args
 
 def kak-bundle-plug-true  -params 2 %{ eval %arg{1} } -override -hidden
 def kak-bundle-plug-false -params 2 %{ eval %arg{2} } -override -hidden
 def kak-bundle-plug-if    -params 3 %{ %arg{@} } -override -hidden
 
-def kak-bundle-plug-loop-1 -params .. %{
-  %arg{@}
+def kak-bundle-plug-rep-opt-2 -params 1 %{
+  eval "set -add global %arg{1} %%opt{%arg{1}}"
 } -override -hidden
-def kak-bundle-plug-loop-2 -params .. %{
-  %arg{@}; %arg{@}
-} -override -hidden
-def kak-bundle-plug-loop-3 -params .. %{
-  %arg{@}; %arg{@}; %arg{@}
-} -override -hidden
-def kak-bundle-plug-loop-4 -params .. %{
-  kak-bundle-plug-loop-2 kak-bundle-plug-loop-2 %arg{@}
-} -override -hidden
-def kak-bundle-plug-loop-5 -params .. %{
-  kak-bundle-plug-loop-4 %arg{@}
-  %arg{@}
-} -override -hidden
-def kak-bundle-plug-loop-6 -params .. %{
-  kak-bundle-plug-loop-2 kak-bundle-plug-loop-3 %arg{@}
-} -override -hidden
-def kak-bundle-plug-loop-7 -params .. %{
-  kak-bundle-plug-loop-6 %arg{@}
-  %arg{@}
-} -override -hidden
-def kak-bundle-plug-loop-8 -params .. %{
-  kak-bundle-plug-loop-2 kak-bundle-plug-loop-4 %arg{@}
-} -override -hidden
-def kak-bundle-plug-loop-9 -params .. %{
-  kak-bundle-plug-loop-3 kak-bundle-plug-loop-3 %arg{@}
-} -override -hidden
+def kak-bundle-plug-rep-opt-4 -params 1 %{
+  kak-bundle-plug-rep-opt-2 %arg{1}
+  kak-bundle-plug-rep-opt-2 %arg{1}
+}
+def kak-bundle-plug-rep-opt-8 -params 1 %{
+  kak-bundle-plug-rep-opt-2 %arg{1}
+  kak-bundle-plug-rep-opt-2 %arg{1}
+  kak-bundle-plug-rep-opt-2 %arg{1}
+}
+def kak-bundle-plug-rep-opt-16 -params 1 %{
+  kak-bundle-plug-rep-opt-4 %arg{1}
+  kak-bundle-plug-rep-opt-4 %arg{1}
+}
+def kak-bundle-plug-rep-opt-64 -params 1 %{
+  kak-bundle-plug-rep-opt-8 %arg{1}
+  kak-bundle-plug-rep-opt-8 %arg{1}
+}
+def kak-bundle-plug-rep-opt-128 -params 1 %{
+  kak-bundle-plug-rep-opt-64 %arg{1}
+  kak-bundle-plug-rep-opt-2 %arg{1}
+}
+def kak-bundle-plug-rep-opt-256 -params 1 %{
+  kak-bundle-plug-rep-opt-16 %arg{1}
+  kak-bundle-plug-rep-opt-16 %arg{1}
+}
+def kak-bundle-plug-rep-opt-1024 -params 1 %{
+  kak-bundle-plug-rep-opt-256 %arg{1}
+  kak-bundle-plug-rep-opt-4 %arg{1}
+}
 
-def kak-bundle-plug-rep-slist-2 -params 1 %{
-  eval "set -add global %arg{1} %%opt{%arg{1}}"
-} -override -hidden
-def kak-bundle-plug-rep-slist-3 -params 1 %{
-  kak-bundle-plug-rep-slist-2 %arg{@}
-  eval "set -add global %arg{1} %%opt{%arg{1}}"
+set global kak_bundle_plug_code_str %{%arg{@};}
+def kak-bundle-plug-loop-1  -params .. "%opt{kak_bundle_plug_code_str}" -override -hidden
+kak-bundle-plug-rep-opt-2 kak_bundle_plug_code_str
+def kak-bundle-plug-loop-2  -params .. "%opt{kak_bundle_plug_code_str}" -override -hidden
+kak-bundle-plug-rep-opt-2 kak_bundle_plug_code_str
+def kak-bundle-plug-loop-4  -params .. "%opt{kak_bundle_plug_code_str}" -override -hidden
+kak-bundle-plug-rep-opt-2 kak_bundle_plug_code_str
+def kak-bundle-plug-loop-8 -params .. "%opt{kak_bundle_plug_code_str}" -override -hidden
+kak-bundle-plug-rep-opt-2 kak_bundle_plug_code_str
+def kak-bundle-plug-loop-16 -params .. "%opt{kak_bundle_plug_code_str}" -override -hidden
+kak-bundle-plug-rep-opt-2 kak_bundle_plug_code_str
+def kak-bundle-plug-loop-32 -params .. "%opt{kak_bundle_plug_code_str}" -override -hidden
+kak-bundle-plug-rep-opt-2 kak_bundle_plug_code_str
+def kak-bundle-plug-loop-64 -params .. "%opt{kak_bundle_plug_code_str}" -override -hidden
+kak-bundle-plug-rep-opt-2 kak_bundle_plug_code_str
+def kak-bundle-plug-loop-128 -params .. "%opt{kak_bundle_plug_code_str}" -override -hidden
+kak-bundle-plug-rep-opt-2 kak_bundle_plug_code_str
+def kak-bundle-plug-loop-256 -params .. "%opt{kak_bundle_plug_code_str}" -override -hidden
+
+def kak-bundle-plug-loop-inf -params .. %{
+  %arg{@}
+  kak-bundle-plug-loop-16 %arg{@}
+  kak-bundle-plug-loop-16 kak-bundle-plug-loop-16 %arg{@}
+  kak-bundle-plug-loop-16 kak-bundle-plug-loop-16 kak-bundle-plug-loop-16 %arg{@}
+  kak-bundle-plug-loop-inf kak-bundle-plug-loop-256 kak-bundle-plug-loop-256 %arg{@}  # will reach recursion limit
+  fail %{loop-inf: shouldn't reach}
 } -override -hidden
 
 def kak-bundle-plug-nop-0_0 -params 0   %{nop} -override -hidden
@@ -154,7 +178,7 @@ def kak-bundle-plug-0 -params .. %{
   try %{
     set global kak_bundle_plug_next %arg{@}
     # decrease recursion by repeating
-    kak-bundle-plug-loop-4 kak-bundle-plug-loop-4 kak-bundle-plug-1
+    kak-bundle-plug-loop-inf kak-bundle-plug-1
     kak-bundle-plug-0 %opt{kak_bundle_plug_next}
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-stop }
 } -override -hidden
