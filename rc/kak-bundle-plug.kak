@@ -32,32 +32,32 @@ def kak-bundle-plug-rep-opt-2 -params 1 %{
 def kak-bundle-plug-rep-opt-4 -params 1 %{
   kak-bundle-plug-rep-opt-2 %arg{1}
   kak-bundle-plug-rep-opt-2 %arg{1}
-}
+} -override -hidden
 def kak-bundle-plug-rep-opt-8 -params 1 %{
   kak-bundle-plug-rep-opt-2 %arg{1}
   kak-bundle-plug-rep-opt-2 %arg{1}
   kak-bundle-plug-rep-opt-2 %arg{1}
-}
+} -override -hidden
 def kak-bundle-plug-rep-opt-16 -params 1 %{
   kak-bundle-plug-rep-opt-4 %arg{1}
   kak-bundle-plug-rep-opt-4 %arg{1}
-}
+} -override -hidden
 def kak-bundle-plug-rep-opt-64 -params 1 %{
   kak-bundle-plug-rep-opt-8 %arg{1}
   kak-bundle-plug-rep-opt-8 %arg{1}
-}
+} -override -hidden
 def kak-bundle-plug-rep-opt-128 -params 1 %{
   kak-bundle-plug-rep-opt-64 %arg{1}
   kak-bundle-plug-rep-opt-2 %arg{1}
-}
+} -override -hidden
 def kak-bundle-plug-rep-opt-256 -params 1 %{
   kak-bundle-plug-rep-opt-16 %arg{1}
   kak-bundle-plug-rep-opt-16 %arg{1}
-}
+} -override -hidden
 def kak-bundle-plug-rep-opt-1024 -params 1 %{
   kak-bundle-plug-rep-opt-256 %arg{1}
   kak-bundle-plug-rep-opt-4 %arg{1}
-}
+} -override -hidden
 
 set global kak_bundle_plug_code_str %{%arg{@};}
 def kak-bundle-plug-loop-1  -params .. "%opt{kak_bundle_plug_code_str}" -override -hidden
