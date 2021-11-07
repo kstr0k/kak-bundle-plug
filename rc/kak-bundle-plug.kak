@@ -264,7 +264,6 @@ def kak-bundle-plug-2 -params .. %{
     kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
-    kak-bundle-plug-streq-orfail noload %arg{1}
     fail "kak-bundle-plug-: unknown parameter <%arg{1}>"
   }
 } -override -hidden
