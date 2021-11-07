@@ -184,13 +184,13 @@ def kak-bundle-plug-stop -params .. %{
 } -override -hidden
 
 def kak-bundle-plug-0 -params .. %{
-  kak-bundle-plug-trpln-land kak-bundle-plug-1-args %arg{@} plug  # <-- terminator
+  kak-bundle-plug-trpln-land kak-bundle-plug-1 %arg{@} plug  # <-- terminator
   try %{
     kak-bundle-plug-loop-inf kak-bundle-plug-trpln-jump
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-stop }
 } -override -hidden
 
-def kak-bundle-plug-1-args -params .. %{
+def kak-bundle-plug-1 -params .. %{
   try %{ kak-bundle-plug-nop-1_ %arg{@} } catch %{
     fail kak-bundle-plug-stop
   }  # stop if args exhausted
@@ -198,7 +198,7 @@ def kak-bundle-plug-1-args -params .. %{
   kak-bundle-plug-shift-1_1 %arg{@}
   try %{  # ignore redundant initial plug
     kak-bundle-plug-streq-orfail %arg{1} plug
-    kak-bundle-plug-trpln-land kak-bundle-plug-1-args %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-1 %opt{kak_bundle_plug_args}
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     set global kak_bundle_plug_cmd_load true
     set global kak_bundle_plug_cmd_config ''
@@ -219,7 +219,7 @@ def kak-bundle-plug-2 -params .. %{
     } %{  # ELSE
       bundle %opt{kak_bundle_plug_cmd_url}
     }
-    kak-bundle-plug-trpln-land kak-bundle-plug-1-args %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-1 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     kak-bundle-plug-streq-orfail config %arg{1}
