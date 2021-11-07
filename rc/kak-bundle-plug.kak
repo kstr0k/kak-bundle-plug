@@ -145,6 +145,15 @@ def kak-bundle-plug-rep-slist-2 -params 1 %{
   eval "set -add global %arg{1} %%opt{%arg{1}}"
 } -override -hidden
 
+# trampoline
+decl -hidden str-list kak_bundle_plug_trpln
+def kak-bundle-plug-trpln-jump -params 0 %{
+  %opt{kak_bundle_plug_trpln}
+} -override -hidden
+def kak-bundle-plug-trpln-land -params .. %{
+  set global kak_bundle_plug_trpln %arg{@}
+} -override -hidden
+
 def kak-bundle-plug-self-preprocess-short2long -docstring %{short -> long while editing source} %{
   try %{ exec -draft '%s' '@' 'E@-' '<ret>c' 'kak-bundle-plug-' '<esc>' }
   try %{ exec -draft '%s' '@' 'E@_' '<ret>c' 'kak_bundle_plug_' '<esc>' }
@@ -165,7 +174,6 @@ def kak-bundle-plug-dbg -params .. %{
 
 # implementation
 
-decl -hidden str-list kak_bundle_plug_next
 decl -hidden str-list kak_bundle_plug_cmd
 decl -hidden str      kak_bundle_plug_cmd_url
 decl -hidden str      kak_bundle_plug_cmd_config
@@ -176,16 +184,10 @@ def kak-bundle-plug-stop -params .. %{
 } -override -hidden
 
 def kak-bundle-plug-0 -params .. %{
-  kak-bundle-plug-next kak-bundle-plug-1-args %arg{@} plug  # <-- terminator
+  kak-bundle-plug-trpln-land kak-bundle-plug-1-args %arg{@} plug  # <-- terminator
   try %{
-    kak-bundle-plug-loop-inf kak-bundle-plug-1
+    kak-bundle-plug-loop-inf kak-bundle-plug-trpln-jump
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-stop }
-} -override -hidden
-def kak-bundle-plug-1 -params 0 %{
-  %opt{kak_bundle_plug_next}
-} -override -hidden
-def kak-bundle-plug-next -params .. %{
-  set global kak_bundle_plug_next %arg{@}
 } -override -hidden
 
 def kak-bundle-plug-1-args -params .. %{
@@ -196,11 +198,11 @@ def kak-bundle-plug-1-args -params .. %{
   kak-bundle-plug-shift-1_1 %arg{@}
   try %{  # ignore redundant initial plug
     kak-bundle-plug-streq-orfail %arg{1} plug
-    kak-bundle-plug-next kak-bundle-plug-1-args %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-1-args %opt{kak_bundle_plug_args}
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     set global kak_bundle_plug_cmd_load true
     set global kak_bundle_plug_cmd_config ''
-    kak-bundle-plug-next kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-2 %opt{kak_bundle_plug_args}
   }
 } -override -hidden
 
@@ -217,7 +219,7 @@ def kak-bundle-plug-2 -params .. %{
     } %{  # ELSE
       bundle %opt{kak_bundle_plug_cmd_url}
     }
-    kak-bundle-plug-next kak-bundle-plug-1-args %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-1-args %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     kak-bundle-plug-streq-orfail config %arg{1}
@@ -225,7 +227,7 @@ def kak-bundle-plug-2 -params .. %{
       %arg{2}
     "
     kak-bundle-plug-shift-1_2 %arg{@}
-    kak-bundle-plug-next kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     kak-bundle-plug-streq-orfail demand %arg{1}
@@ -236,42 +238,42 @@ def kak-bundle-plug-2 -params .. %{
       }
     "
     kak-bundle-plug-shift-1_3 %arg{@}
-    kak-bundle-plug-next kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     kak-bundle-plug-streq-orfail defer %arg{1}
     kak-bundle-plug-2-defer %arg{@}
     kak-bundle-plug-shift-1_3 %arg{@}
-    kak-bundle-plug-next kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     kak-bundle-plug-streq-orfail load-path %arg{1}
     set global kak_bundle_plug_cmd_url "ln -sf ""%arg{2}"" # %arg{2}"  # avoid stray final '"'
     kak-bundle-plug-shift-1_2 %arg{@}
-    kak-bundle-plug-next kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     kak-bundle-plug-streq-orfail noload %arg{1}
     set global kak_bundle_plug_cmd_load false
     kak-bundle-plug-shift-1_1 %arg{@}
-    kak-bundle-plug-next kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     kak-bundle-plug-streq-orfail branch %arg{1}
     set global kak_bundle_plug_cmd_url "git clone %opt{bundle_git_clone_opts} %opt{bundle_git_shallow_opts} --branch=%arg{2} %opt{kak_bundle_plug_cmd_url}"
     kak-bundle-plug-shift-1_2 %arg{@}
-    kak-bundle-plug-next kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     kak-bundle-plug-streq-orfail tag %arg{1}
     set global kak_bundle_plug_cmd_url "git clone %opt{bundle_git_clone_opts} %opt{bundle_git_shallow_opts} --tags --branch=%arg{2} %opt{kak_bundle_plug_cmd_url}"
     kak-bundle-plug-shift-1_2 %arg{@}
-    kak-bundle-plug-next kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     kak-bundle-plug-streq-orfail comment %arg{1}
     kak-bundle-plug-shift-1_2 %arg{@}
-    kak-bundle-plug-next kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+    kak-bundle-plug-trpln-land kak-bundle-plug-2 %opt{kak_bundle_plug_args}
 
   } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
     fail "kak-bundle-plug-: unknown parameter <%arg{1}>"
