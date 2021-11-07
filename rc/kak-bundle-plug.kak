@@ -190,16 +190,21 @@ def kak-bundle-plug-1-args -params .. %{
   try %{ kak-bundle-plug-nop-1_ %arg{@} } catch %{
     fail kak-bundle-plug-stop
   }  # stop if args exhausted
-  set global kak_bundle_plug_cmd_load true
   set global kak_bundle_plug_cmd_url %arg{1}
-  set global kak_bundle_plug_cmd_config ''
-  set global kak_bundle_plug_next
   kak-bundle-plug-shift-1_1 %arg{@}
-  kak-bundle-plug-2 %opt{kak_bundle_plug_args}
-  kak-bundle-plug-if "kak-bundle-plug-%opt{kak_bundle_plug_cmd_load}" %{
-    set -add global kak_bundle_plug_cmd %opt{kak_bundle_plug_cmd_url} %opt{kak_bundle_plug_cmd_config}
-  } %{  # ELSE
-    bundle %opt{kak_bundle_plug_cmd_url}
+  try %{  # ignore redundant initial plug
+    kak-bundle-plug-streq-orfail %arg{1} plug
+    kak-bundle-plug-1-args %opt{kak_bundle_plug_args}
+  } catch %{ kak-bundle-plug-err-chk kak-bundle-plug-strcmp-fail
+    set global kak_bundle_plug_cmd_load true
+    set global kak_bundle_plug_cmd_config ''
+    set global kak_bundle_plug_next
+    kak-bundle-plug-2 %opt{kak_bundle_plug_args}
+    kak-bundle-plug-if "kak-bundle-plug-%opt{kak_bundle_plug_cmd_load}" %{
+      set -add global kak_bundle_plug_cmd %opt{kak_bundle_plug_cmd_url} %opt{kak_bundle_plug_cmd_config}
+    } %{  # ELSE
+      bundle %opt{kak_bundle_plug_cmd_url}
+    }
   }
 } -override -hidden
 
