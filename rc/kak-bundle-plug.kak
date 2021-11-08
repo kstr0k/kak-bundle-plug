@@ -20,8 +20,7 @@ eval -- %sh{ set -u
   fi
 }; echo -debug %{kak-bundle-plug: compiled version loaded}
 nop -- %{
-#PP:IGNORE
-#PP:IN
+#PP:IGNORE#PP:IN
 
 def @E@:- -params 1.. -docstring %{
   Partially emulates plug.kak using kak-bundle
@@ -310,7 +309,6 @@ def kak-bundle-plug-2-defer -params .. %{
     hook -group kak-bundle-plug global ModuleLoaded %arg{2} %%{%arg{3}}
   "
 } -override -hidden
-#PP:COPY
-#PP:IN
+#PP:COPY#PP:IN
 }
 #PP:IGNORE
