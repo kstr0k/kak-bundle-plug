@@ -10,7 +10,7 @@ my ($src) = @ARGV;
 my $code; my $compiled;
 $src =~ s/^#PP:IN/\$code = <<'PLEOKAK';/gm;
 $src =~ s/^#PP:(OUT|IGN.*)/PLEOKAK/gm;
-$src =~ s/^#PP:COPY/\$compiled .= \$code;/gm;
+$src =~ s/^#PP:COPY/PLEOKAK\n\$compiled .= \$code;/gm;
 $src =~ s/^#PP:CODE//gm;
 #{ open my $fh, q[>], q[/tmp/kakinv.pl]; print $fh $src; }
 eval $src; print $compiled;
@@ -316,7 +316,6 @@ def kak-bundle-plug-2-defer -params .. %{
     hook -group kak-bundle-plug global ModuleLoaded %arg{2} %%{%arg{3}}
   "
 } -override -hidden
-#PP:OUT
 #PP:COPY
 #PP:IN
 }
