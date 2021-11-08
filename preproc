@@ -5,10 +5,11 @@ my ($src, $global_rewrite) = @ARGV;
 my $code; my $compiled;
 $_ = $src;
 { eval $global_rewrite; }
-s/^#PP:IN/\$code = <<'PLEOKAK';/gm;
-s/^#PP:(OUT|IGN.*)/PLEOKAK/gm;
-s/^#PP:COPY\b(.*)/PLEOKAK\n$1\n\$compiled .= \$code;/gm;
-s/^#PP:CODE//gm;
+s/^#PP:(OUT|IGN[[:upper:]]*)\b/PLEOKAK\n/gm;
+s/^#PP:COPY\b/PLEOKAK\n\$compiled .= \$code;\n/gm;
+s/^#PP:REWRITE\b(.*)/PLEOKAK\n$1\n\$compiled .= \$code;/gm;
+s/^#PP:CODE\b//gm;
+s/^#PP:IN\b/\$code = <<'PLEOKAK';/gm;
 $src = $_;
 #{ open my $fh, q[>], q[/tmp/kakinv.pl]; print $fh $src; }
 eval $src; print $compiled;
