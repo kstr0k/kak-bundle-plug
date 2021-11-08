@@ -3,15 +3,22 @@ eval -- %sh{ set -u
   compile() {
     echo >&2 'kak-bundle-plug: compiling'
     #cp "$1" "$2"
-    PERL_UNICODE=SDA exec perl -- - "$1" >"$2" <<'EOPERL'
+    local global_rewrite; global_rewrite='my $p=q(@E@);
+      s/${p}-/kak-bundle-plug-/g; s/${p}_/kak_bundle_plug_/g;
+      s/${p}:-/kak-bundle-plug/g;
+    '
+    PERL_UNICODE=SDA exec perl -- - "$1" "$global_rewrite" >"$2" <<'EOPERL'
 use strict; use warnings; use autodie; use v5.28.0; use Carp; use Data::Dumper;
-my ($src) = @ARGV;
+my ($src, $global_rewrite) = @ARGV;
 { local $/; open my $fh, q[<], $src; $src = <$fh>; close $fh; }
 my $code; my $compiled;
-$src =~ s/^#PP:IN/\$code = <<'PLEOKAK';/gm;
-$src =~ s/^#PP:(OUT|IGN.*)/PLEOKAK/gm;
-$src =~ s/^#PP:COPY/PLEOKAK\n\$compiled .= \$code;/gm;
-$src =~ s/^#PP:CODE//gm;
+$_ = $src;
+{ eval $global_rewrite; }
+s/^#PP:IN/\$code = <<'PLEOKAK';/gm;
+s/^#PP:(OUT|IGN.*)/PLEOKAK/gm;
+s/^#PP:COPY\b(.*)/PLEOKAK\n$1\n\$compiled .= \$code;/gm;
+s/^#PP:CODE//gm;
+$src = $_;
 #{ open my $fh, q[>], q[/tmp/kakinv.pl]; print $fh $src; }
 eval $src; print $compiled;
 EOPERL
@@ -29,7 +36,7 @@ nop -- %{
 #PP:IGNORE
 #PP:IN
 
-def kak-bundle-plug -params 1.. -docstring %{
+def @E@:- -params 1.. -docstring %{
   Partially emulates plug.kak using kak-bundle
   Args: [ {URL|CMD} POST-LOAD plug]..
     POST-LOAD: {
@@ -38,9 +45,9 @@ def kak-bundle-plug -params 1.. -docstring %{
       load-path PATH
     }
 } %{
-  set global kak_bundle_plug_cmd
-  kak-bundle-plug-0 %arg{@}
-  bundle-register-and-load %opt{kak_bundle_plug_cmd}
+  set global @E@_cmd
+  @E@-0 %arg{@}
+  bundle-register-and-load %opt{@E@_cmd}
 } -override
 
 
