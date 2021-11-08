@@ -1,6 +1,5 @@
 #PP:IN
-try %{
-  eval -- %sh{ set -u
+eval -- %sh{ set -u
   compile() {
     echo >&2 'kak-bundle-plug: compiling'
     #cp "$1" "$2"
@@ -19,14 +18,14 @@ EOPERL
   }
   set -- "$kak_source"
   case "$1" in (*.compiled)
-    echo 'fail nop'; return 0
+    echo 'fail %{kak-bundle-plug: compiler failure}'; return 1
   esac
   set -- "$1" "$1".compiled; echo "source %\"$2\""
   if [ -e "$2" ] && [ "$2" -nt "$1" ] && ! [ "$2" -ot "$2" ]; then :
   else compile "$@"
   fi
-  }; echo -debug %{kak-bundle-plug: compiled version loaded}
-} catch %{ eval -- %val{error}
+}; echo -debug %{kak-bundle-plug: compiled version loaded}
+nop -- %{
 #PP:IGNORE
 #PP:IN
 
@@ -319,7 +318,6 @@ def kak-bundle-plug-2-defer -params .. %{
 } -override -hidden
 #PP:OUT
 #PP:COPY
-
 #PP:IN
-} catch %{ echo -debug 'kak-bundle-plug: loading error: ' %val{error} }
+}
 #PP:IGNORE
