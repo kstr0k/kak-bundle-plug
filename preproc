@@ -7,7 +7,7 @@ $_ = $src;
 { eval $global_rewrite; }
 s/^#PP:(OUT|IGN[[:upper:]]*)\b/PLEOKAK\n/gm;
 s/^#PP:COPY\b/PLEOKAK\n\$compiled .= \$code;\n/gm;
-s/^#PP:REWRITE\b(.*)/PLEOKAK\n$1\n\$compiled .= \$code;/gm;
+s/^#PP:REWRITE\b(.*)/PLEOKAK\n{ $1 }\n\$compiled .= \$code;/gm;
 s/^#PP:CODE\b//gm;
 s/^#PP:IN\b/\$code = <<'PLEOKAK';/gm;
 $src = $_;
