@@ -1,21 +1,34 @@
+#PP:IN
 try %{
   eval -- %sh{ set -u
   compile() {
     echo >&2 'kak-bundle-plug: compiling'
-    cp "$1" "$2"
+    #cp "$1" "$2"
+    PERL_UNICODE=SDA exec perl -- - "$1" >"$2" <<'EOPERL'
+use strict; use warnings; use autodie; use v5.28.0; use Carp; use Data::Dumper;
+my ($src) = @ARGV;
+{ local $/; open my $fh, q[<], $src; $src = <$fh>; close $fh; }
+my $code; my $compiled;
+$src =~ s/^#PP:IN/\$code = <<'PLEOKAK';/gm;
+$src =~ s/^#PP:(OUT|IGN.*)/PLEOKAK/gm;
+$src =~ s/^#PP:COPY/\$compiled .= \$code;/gm;
+$src =~ s/^#PP:CODE//gm;
+#{ open my $fh, q[>], q[/tmp/kakinv.pl]; print $fh $src; }
+eval $src; print $compiled;
+EOPERL
   }
-
   set -- "$kak_source"
   case "$1" in (*.compiled)
     echo 'fail nop'; return 0
   esac
-  set -- "$1" "$1".compiled
+  set -- "$1" "$1".compiled; echo "source %\"$2\""
   if [ -e "$2" ] && [ "$2" -nt "$1" ] && ! [ "$2" -ot "$2" ]; then :
   else compile "$@"
   fi
-  echo "source %\"$2\""
   }; echo -debug %{kak-bundle-plug: compiled version loaded}
 } catch %{ eval -- %val{error}
+#PP:IGNORE
+#PP:IN
 
 def kak-bundle-plug -params 1.. -docstring %{
   Partially emulates plug.kak using kak-bundle
@@ -304,5 +317,9 @@ def kak-bundle-plug-2-defer -params .. %{
     hook -group kak-bundle-plug global ModuleLoaded %arg{2} %%{%arg{3}}
   "
 } -override -hidden
+#PP:OUT
+#PP:COPY
 
+#PP:IN
 } catch %{ echo -debug 'kak-bundle-plug: loading error: ' %val{error} }
+#PP:IGNORE
