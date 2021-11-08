@@ -63,22 +63,11 @@ def @E@-rep-opt-1024 -params 1 %{
 
 set global @E@_code_str %{%arg{@};}
 def @E@-loop-1  -params .. "%opt{@E@_code_str}" -override -hidden
+#PP:COPY#PP:IN
 @E@-rep-opt-2 @E@_code_str
-def @E@-loop-2  -params .. "%opt{@E@_code_str}" -override -hidden
-@E@-rep-opt-2 @E@_code_str
-def @E@-loop-4  -params .. "%opt{@E@_code_str}" -override -hidden
-@E@-rep-opt-2 @E@_code_str
-def @E@-loop-8 -params .. "%opt{@E@_code_str}" -override -hidden
-@E@-rep-opt-2 @E@_code_str
-def @E@-loop-16 -params .. "%opt{@E@_code_str}" -override -hidden
-@E@-rep-opt-2 @E@_code_str
-def @E@-loop-32 -params .. "%opt{@E@_code_str}" -override -hidden
-@E@-rep-opt-2 @E@_code_str
-def @E@-loop-64 -params .. "%opt{@E@_code_str}" -override -hidden
-@E@-rep-opt-2 @E@_code_str
-def @E@-loop-128 -params .. "%opt{@E@_code_str}" -override -hidden
-@E@-rep-opt-2 @E@_code_str
-def @E@-loop-256 -params .. "%opt{@E@_code_str}" -override -hidden
+def @E@-loop-NNP2  -params .. "%opt{@E@_code_str}" -override -hidden
+#PP:REWRITE my $t = $code; $code=q[]; for my $NN( 1..8 ) { my $NNP2 = 2 ** $NN; $code .= ($t =~ s/NNP2/$NNP2/gr) }
+#PP:IN
 
 def @E@-loop-inf -params .. %{
   %arg{@}
