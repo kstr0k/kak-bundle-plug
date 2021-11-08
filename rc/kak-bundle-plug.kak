@@ -1,3 +1,22 @@
+try %{
+  eval -- %sh{ set -u
+  compile() {
+    echo >&2 'kak-bundle-plug: compiling'
+    cp "$1" "$2"
+  }
+
+  set -- "$kak_source"
+  case "$1" in (*.compiled)
+    echo 'fail nop'; return 0
+  esac
+  set -- "$1" "$1".compiled
+  if [ -e "$2" ] && [ "$2" -nt "$1" ] && ! [ "$2" -ot "$2" ]; then :
+  else compile "$@"
+  fi
+  echo "source %\"$2\""
+  }; echo -debug %{kak-bundle-plug: compiled version loaded}
+} catch %{ eval -- %val{error}
+
 def kak-bundle-plug -params 1.. -docstring %{
   Partially emulates plug.kak using kak-bundle
   Args: [ {URL|CMD} POST-LOAD plug]..
@@ -285,3 +304,5 @@ def kak-bundle-plug-2-defer -params .. %{
     hook -group kak-bundle-plug global ModuleLoaded %arg{2} %%{%arg{3}}
   "
 } -override -hidden
+
+} catch %{ echo -debug 'kak-bundle-plug: loading error: ' %val{error} }
