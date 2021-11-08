@@ -7,13 +7,14 @@ eval -- %sh{ set -u
       s/${p}-/kak-bundle-plug-/g; s/${p}_/kak_bundle_plug_/g;
       s/${p}:-/kak-bundle-plug/g;
     '
-    PERL_UNICODE=SDA perl -- "$mydir"/../preproc "$1" "$global_rewrite" >"$2"
+    PERL_UNICODE=SDA perl -- "$mydir"/../preproc "$1" "$global_rewrite" >"$2" && [ -s "$2" ] || return 1
   }
   set -- "$kak_source"
   set -- "$1".in "$1".compiled; echo "source %\"$2\""
   if [ -e "$2" ] && [ "$2" -nt "$1" ] && ! [ "$2" -ot "$2" ]; then return 0; fi
   if ! compile "$@"; then
     rm -f "$2"
-    echo >&2 "$myname: compiler failure"
+    echo "fail %{$myname: compiler failure}"
+    exit 1
   fi
 }; echo -debug %{kak-bundle-plug: compiled version loaded}
