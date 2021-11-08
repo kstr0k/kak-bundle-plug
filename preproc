@@ -1,10 +1,13 @@
 #!/usr/bin/env -S perl -CSDA
+use strict; use warnings; use autodie; use v5.28; use Carp; use Data::Dumper;
 
 my ($src, $global_rewrite) = @ARGV;
-{ local $/; open my $fh, q[<], $src; $src = <$fh>; close $fh; }
 my $code; my $compiled;
+
+{ local $/; open my $fh, q[<], $src; $src = <$fh>; close $fh; }
+
 $_ = $src;
-{ eval $global_rewrite; }
+eval $global_rewrite or die "preproc: $@";
 s/^#PP:(OUT|IGN[[:upper:]]*)\b/PLEOKAK\n/gm;
 s/^#PP:COPY\b/PLEOKAK\n\$compiled .= \$code;\n/gm;
 s/^#PP:REWRITE\b(.*)/PLEOKAK\n{ $1 }\n\$compiled .= \$code;/gm;
@@ -12,4 +15,5 @@ s/^#PP:CODE\b//gm;
 s/^#PP:IN\b/\$code = <<'PLEOKAK';/gm;
 $src = $_;
 #{ open my $fh, q[>], q[/tmp/kakinv.pl]; print $fh $src; }
-eval $src; print $compiled;
+eval $src or die "preproc: $@";
+print $compiled;
