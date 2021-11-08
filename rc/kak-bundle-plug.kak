@@ -1,5 +1,6 @@
 #PP:IN
 eval -- %sh{ set -u
+  mydir=${kak_source%/*}; : "${mydir:=/}"
   compile() {
     echo >&2 'kak-bundle-plug: compiling'
     #cp "$1" "$2"
@@ -7,21 +8,7 @@ eval -- %sh{ set -u
       s/${p}-/kak-bundle-plug-/g; s/${p}_/kak_bundle_plug_/g;
       s/${p}:-/kak-bundle-plug/g;
     '
-    PERL_UNICODE=SDA exec perl -- - "$1" "$global_rewrite" >"$2" <<'EOPERL'
-use strict; use warnings; use autodie; use v5.28.0; use Carp; use Data::Dumper;
-my ($src, $global_rewrite) = @ARGV;
-{ local $/; open my $fh, q[<], $src; $src = <$fh>; close $fh; }
-my $code; my $compiled;
-$_ = $src;
-{ eval $global_rewrite; }
-s/^#PP:IN/\$code = <<'PLEOKAK';/gm;
-s/^#PP:(OUT|IGN.*)/PLEOKAK/gm;
-s/^#PP:COPY\b(.*)/PLEOKAK\n$1\n\$compiled .= \$code;/gm;
-s/^#PP:CODE//gm;
-$src = $_;
-#{ open my $fh, q[>], q[/tmp/kakinv.pl]; print $fh $src; }
-eval $src; print $compiled;
-EOPERL
+    PERL_UNICODE=SDA exec perl -- "$mydir"/../preproc "$1" "$global_rewrite" >"$2"
   }
   set -- "$kak_source"
   case "$1" in (*.compiled)
