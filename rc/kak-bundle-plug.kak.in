@@ -89,9 +89,12 @@ def @E@-loop-inf -params .. %{
   fail %{loop-inf: shouldn't reach}
 } -override -hidden
 
-def @E@-nop-0_0 -params 0   %{nop} -override -hidden
-def @E@-nop-1_  -params 1.. %{nop} -override -hidden
-def @E@-nop-1_1 -params 1   %{nop} -override -hidden
+#PP:COPY#PP:IN
+def @E@-nop-NN_   -params NN.. %{nop} -override -hidden
+def @E@-nop-NN_NN -params NN   %{nop} -override -hidden
+def @E@-nop-_NN   -params ..NN %{nop} -override -hidden
+#PP:REWRITE my $t = $code; $code=q[]; for my $NN( 0..2 ) { $code .= ($t =~ s/NN/$NN/gr) }
+#PP:IN
 
 def @E@-shift-1_1 -params 1.. %{
   set         global @E@_args %arg{@}
@@ -126,7 +129,7 @@ def @E@-err-chk -params .. -docstring %{
 def @E@-strne -params 2 %{
   set         global @E@_test_slist %arg{1}
   set -remove global @E@_test_slist %arg{2}
-  @E@-nop-1   %opt{@E@_test_slist}
+  @E@-nop-1_1   %opt{@E@_test_slist}
 } -override -hidden
 
 def @E@-streq -params 2 %{
