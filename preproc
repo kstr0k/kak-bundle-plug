@@ -5,6 +5,18 @@ use warnings FATAL => qw( uninitialized );
 my ($src, $global_rewrite) = @ARGV;
 my $code; my $compiled;
 
+sub macroexpand {
+  while( 1 ) {
+    my $re; $re = qr{
+      \{
+         (?: (?> [^{}]+ ) | (??{ $re }))*
+      \}
+    };
+    last unless $_[1] =~ s{ ([[:alnum:]_-]):: $re}{
+    }xmesg;
+  }
+}
+
 { local $/; open my $fh, q[<], $src; $src = <$fh>; close $fh; }
 
 $_ = $src;
