@@ -26,7 +26,7 @@ decl -hidden str-list @E@_args
 
 def @E@-true  -params 2 %{ eval %arg{1} } -override -hidden
 def @E@-false -params 2 %{ eval %arg{2} } -override -hidden
-def @E@-if    -params 3 %{ %arg{@} } -override -hidden
+def @E@-if    -params 3 %{ "@E@-%arg{1}" %arg{2} %arg{3} } -override -hidden
 
 def @E@-rep-opt-2 -params 1 %{
   eval "set -add global %%arg{1} %%opt{%arg{1}}"
@@ -179,7 +179,7 @@ def @E@-2__t -params .. %{
   } catch %{
     @E@-streq-orfail plug %arg{1}  # separator / terminator
     @E@-shift-1_1 %arg{@}
-    @E@-if "@E@-%opt{@E@_cmd_load}" %{
+    @E@-if %opt{@E@_cmd_load} %{
       set -add global @E@_cmd %opt{@E@_cmd_url} %opt{@E@_cmd_config}
     } %{  # ELSE
       bundle %opt{@E@_cmd_url}
