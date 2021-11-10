@@ -44,13 +44,13 @@ def @E@-loop-NNP2  -params .. "%opt{@E@_code_str}" -override -hidden
 #PP:REWRITE my $t = $code; $code=q[]; for my $NN( 1..8 ) { my $NNP2 = 2 ** $NN; $code .= ($t =~ s/NNP2/$NNP2/gr) }
 #PP:IN
 
+# will hit recursion limit sometime before the universe ends
 def @E@-loop-inf -params .. %{
-  %arg{@}
-  @E@-loop-16 %arg{@}
-  @E@-loop-16 @E@-loop-16 %arg{@}
-  @E@-loop-16 @E@-loop-16 @E@-loop-16 %arg{@}
-  @E@-loop-inf @E@-loop-256 @E@-loop-256 %arg{@}  # will reach recursion limit
-  fail %{loop-inf: shouldn't reach}
+%arg{@};%arg{@};%arg{@};%arg{@};%arg{@};%arg{@};%arg{@};%arg{@}
+@E@-loop-16 %arg{@};@E@-loop-16 %arg{@};@E@-loop-16 %arg{@};@E@-loop-16 %arg{@}
+@E@-loop-16 @E@-loop-256 %arg{@}
+@E@-loop-inf @E@-loop-256 @E@-loop-256 %arg{@}
+fail %{loop-inf: shouldn't reach}
 } -override -hidden
 
 #PP:COPY#PP:IN
