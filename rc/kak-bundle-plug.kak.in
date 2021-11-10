@@ -70,9 +70,9 @@ fail %{loop-inf: shouldn't reach}
 } -override -hidden
 
 #PP:COPY#PP:IN
-def @E@-nop-NN_   -params NN.. %{nop} -override -hidden
-def @E@-nop-NN_NN -params NN   %{nop} -override -hidden
-def @E@-nop-_NN   -params ..NN %{nop} -override -hidden
+def @E@-nop-NN_   -params NN.. %{} -override -hidden
+def @E@-nop-NN_NN -params NN   %{} -override -hidden
+def @E@-nop-_NN   -params ..NN %{} -override -hidden
 #PP:REWRITE my $t = $code; $code=q[]; for my $NN( 0..2 ) { $code .= ($t =~ s/NN/$NN/gr) }
 #PP:IN
 
