@@ -31,35 +31,10 @@ def @E@-if    -params 3 %{ %arg{@} } -override -hidden
 def @E@-rep-opt-2 -params 1 %{
   eval "set -add global %arg{1} %%opt{%arg{1}}"
 } -override -hidden
-def @E@-rep-opt-4 -params 1 %{
-  @E@-rep-opt-2 %arg{1}
-  @E@-rep-opt-2 %arg{1}
-} -override -hidden
-def @E@-rep-opt-8 -params 1 %{
-  @E@-rep-opt-2 %arg{1}
-  @E@-rep-opt-2 %arg{1}
-  @E@-rep-opt-2 %arg{1}
-} -override -hidden
-def @E@-rep-opt-16 -params 1 %{
-  @E@-rep-opt-4 %arg{1}
-  @E@-rep-opt-4 %arg{1}
-} -override -hidden
-def @E@-rep-opt-64 -params 1 %{
-  @E@-rep-opt-8 %arg{1}
-  @E@-rep-opt-8 %arg{1}
-} -override -hidden
-def @E@-rep-opt-128 -params 1 %{
-  @E@-rep-opt-64 %arg{1}
-  @E@-rep-opt-2 %arg{1}
-} -override -hidden
-def @E@-rep-opt-256 -params 1 %{
-  @E@-rep-opt-16 %arg{1}
-  @E@-rep-opt-16 %arg{1}
-} -override -hidden
-def @E@-rep-opt-1024 -params 1 %{
-  @E@-rep-opt-256 %arg{1}
-  @E@-rep-opt-4 %arg{1}
-} -override -hidden
+#PP:COPY#PP:IN
+@E@-rep-opt-2 %arg{1}
+#PP:REWRITE my $t = $code; $code = q[]; for my $NN( 2..10 ) { my $NNP2 = 2 ** $NN; $code .= qq[def @E@-rep-opt-$NNP2 -params 1 %{\n] . ($t x $NN) . qq [} -override -hidden\n] }
+#PP:IN
 
 set global @E@_code_str %{%arg{@};}
 def @E@-loop-1  -params .. "%opt{@E@_code_str}" -override -hidden
