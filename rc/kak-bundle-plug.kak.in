@@ -153,13 +153,13 @@ def @E@-stop -params .. %{
 } -override -hidden
 
 def @E@-0 -params .. %{
-  @E@-trpln-land @E@-1 %arg{@} plug  # <-- terminator
+  @E@-trpln-land @E@-1__t %arg{@} plug  # <-- terminator
   try %{
     @E@-loop-inf @E@-trpln-jump
   } catch %{ @E@-err-chk @E@-stop }
 } -override -hidden
 
-def @E@-1 -params .. %{
+def @E@-1__t -params .. %{
   try %{ @E@-nop-1_ %arg{@} } catch %{
     fail @E@-stop
   }  # stop if args exhausted
@@ -167,18 +167,18 @@ def @E@-1 -params .. %{
   @E@-shift-1_1 %arg{@}
   try %{  # ignore redundant initial plug
     @E@-streq-orfail %arg{1} plug
-    @E@-trpln-land @E@-1 %opt{@E@_args}
+    @E@-trpln-land @E@-1__t %opt{@E@_args}
   } catch %{ @E@-err-chk @E@-strcmp-fail
     set global @E@_cmd_load true
     set global @E@_cmd_config ''
-    @E@-trpln-land @E@-2 %opt{@E@_args}
+    @E@-trpln-land @E@-2__t %opt{@E@_args}
   }
 } -override -hidden
 
-def @E@-2 -params .. %{
+def @E@-2__t -params .. %{
   try %{
     @E@-nop-0_0 %arg{@}
-    fail %{kak-bundle-plug: internal error}
+    fail %{@E@:-: internal error}
 
   } catch %{
     @E@-streq-orfail plug %arg{1}  # separator / terminator
@@ -188,7 +188,7 @@ def @E@-2 -params .. %{
     } %{  # ELSE
       bundle %opt{@E@_cmd_url}
     }
-    @E@-trpln-land @E@-1 %opt{@E@_args}
+    @E@-trpln-land @E@-1__t %opt{@E@_args}
 
   } catch %{ @E@-err-chk @E@-strcmp-fail
     @E@-streq-orfail config %arg{1}
@@ -196,7 +196,7 @@ def @E@-2 -params .. %{
       %arg{2}
     "
     @E@-shift-1_2 %arg{@}
-    @E@-trpln-land @E@-2 %opt{@E@_args}
+    @E@-trpln-land @E@-2__t %opt{@E@_args}
 
   } catch %{ @E@-err-chk @E@-strcmp-fail
     @E@-streq-orfail demand %arg{1}
@@ -207,42 +207,42 @@ def @E@-2 -params .. %{
       }
     "
     @E@-shift-1_3 %arg{@}
-    @E@-trpln-land @E@-2 %opt{@E@_args}
+    @E@-trpln-land @E@-2__t %opt{@E@_args}
 
   } catch %{ @E@-err-chk @E@-strcmp-fail
     @E@-streq-orfail defer %arg{1}
     @E@-2-defer %arg{@}
     @E@-shift-1_3 %arg{@}
-    @E@-trpln-land @E@-2 %opt{@E@_args}
+    @E@-trpln-land @E@-2__t %opt{@E@_args}
 
   } catch %{ @E@-err-chk @E@-strcmp-fail
     @E@-streq-orfail load-path %arg{1}
     set global @E@_cmd_url "ln -sf ""%arg{2}"" # %arg{2}"  # avoid stray final '"'
     @E@-shift-1_2 %arg{@}
-    @E@-trpln-land @E@-2 %opt{@E@_args}
+    @E@-trpln-land @E@-2__t %opt{@E@_args}
 
   } catch %{ @E@-err-chk @E@-strcmp-fail
     @E@-streq-orfail noload %arg{1}
     set global @E@_cmd_load false
     @E@-shift-1_1 %arg{@}
-    @E@-trpln-land @E@-2 %opt{@E@_args}
+    @E@-trpln-land @E@-2__t %opt{@E@_args}
 
   } catch %{ @E@-err-chk @E@-strcmp-fail
     @E@-streq-orfail branch %arg{1}
     set global @E@_cmd_url "git clone %opt{bundle_git_clone_opts} %opt{bundle_git_shallow_opts} --branch=%arg{2} %opt{@E@_cmd_url}"
     @E@-shift-1_2 %arg{@}
-    @E@-trpln-land @E@-2 %opt{@E@_args}
+    @E@-trpln-land @E@-2__t %opt{@E@_args}
 
   } catch %{ @E@-err-chk @E@-strcmp-fail
     @E@-streq-orfail tag %arg{1}
     set global @E@_cmd_url "git clone %opt{bundle_git_clone_opts} %opt{bundle_git_shallow_opts} --tags --branch=%arg{2} %opt{@E@_cmd_url}"
     @E@-shift-1_2 %arg{@}
-    @E@-trpln-land @E@-2 %opt{@E@_args}
+    @E@-trpln-land @E@-2__t %opt{@E@_args}
 
   } catch %{ @E@-err-chk @E@-strcmp-fail
     @E@-streq-orfail comment %arg{1}
     @E@-shift-1_2 %arg{@}
-    @E@-trpln-land @E@-2 %opt{@E@_args}
+    @E@-trpln-land @E@-2__t %opt{@E@_args}
 
   } catch %{ @E@-err-chk @E@-strcmp-fail
     fail "@E@-: unknown parameter <%arg{1}>"
