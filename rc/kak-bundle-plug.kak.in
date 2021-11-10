@@ -110,10 +110,6 @@ def @E@-streq-orfail -params 2..3 %{
   try %{ @E@-streq %arg{1} %arg{2} } catch %{ fail "@E@-strcmp-fail%arg{3}" }
 } -override -hidden
 
-def @E@-rep-slist-2 -params 1 %{
-  eval "set -add global %arg{1} %%opt{%arg{1}}"
-} -override -hidden
-
 # trampoline
 decl -hidden str-list @E@_trpln
 def @E@-trpln-jump -params 0 %{
