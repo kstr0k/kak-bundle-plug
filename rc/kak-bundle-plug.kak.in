@@ -29,7 +29,7 @@ def @E@-false -params 2 %{ eval %arg{2} } -override -hidden
 def @E@-if    -params 3 %{ %arg{@} } -override -hidden
 
 def @E@-rep-opt-2 -params 1 %{
-  eval "set -add global %arg{1} %%opt{%arg{1}}"
+  eval "set -add global %%arg{1} %%opt{%arg{1}}"
 } -override -hidden
 #PP:COPY#PP:IN
 @E@-rep-opt-2 %arg{1}
