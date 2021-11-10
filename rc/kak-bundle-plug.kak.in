@@ -24,6 +24,22 @@ decl -hidden str-list @E@_code_slist
 decl -hidden str      @E@_code_str
 decl -hidden str-list @E@_args
 
+decl -hidden str-list @E@_test_err_slist
+def @E@-err-chk -params .. -docstring %{
+  If err != arg1, calls %arg{@}
+  if err == arg1, calls %arg{@:2}
+  E.g. chk fail nop %val{error} ('fail fail' in code): ignore 'fail', or re-raise
+  Use with custom def'd fails or @E@-rethrow aliases
+  Note: executing empty str-list succeeds; set, but not 'reg' can create emty lists
+} %{
+  set         global @E@_test_err_slist %arg{@}
+  set -remove global @E@_test_err_slist %val{error}
+  %opt{@E@_test_err_slist}
+} -override -hidden
+
+def @E@-rethrow %{ fail %val{error} } -override -hidden
+alias global @E@-stop @E@-rethrow
+
 def @E@-true  -params 2 %{ eval %arg{1} } -override -hidden
 def @E@-false -params 2 %{ eval %arg{2} } -override -hidden
 def @E@-if    -params 3 %{ "@E@-%arg{1}" %arg{2} %arg{3} } -override -hidden
@@ -77,19 +93,6 @@ def @E@-shift-1_4 -params 4.. %{
   set -remove global @E@_args %arg{1} %arg{2} %arg{3} %arg{4}
 } -override -hidden
 
-decl -hidden str-list @E@_test_err_slist
-def @E@-err-chk -params .. -docstring %{
-  If err != arg1, calls %arg{@}
-  if err == arg1, calls %arg{@:2}
-  E.g. chk fail nop %val{error} ('fail fail' in code): ignore 'fail', or re-raise
-  Use with custom def'd fails
-  Note: executing empty str-list succeeds; set, but not 'reg' can create emty lists
-} %{
-  set         global @E@_test_err_slist %arg{@}
-  set -remove global @E@_test_err_slist %val{error}
-  %opt{@E@_test_err_slist}
-} -override -hidden
-
 def @E@-strne -params 2 %{
   set         global @E@_test_slist %arg{1}
   set -remove global @E@_test_slist %arg{2}
@@ -102,7 +105,7 @@ def @E@-streq -params 2 %{
   @E@-nop-0_0 %opt{@E@_test_slist}
 } -override -hidden
 
-def @E@-strcmp-fail -params .. -override -hidden %{ fail %val{error} }
+alias global @E@-strcmp-fail @E@-rethrow
 def @E@-strne-orfail -params 2..3 %{
   try %{ @E@-strne %arg{1} %arg{2} } catch %{ fail "@E@-strcmp-fail%arg{3}" }
 } -override -hidden
@@ -143,10 +146,6 @@ decl -hidden str-list @E@_cmd
 decl -hidden str      @E@_cmd_url
 decl -hidden str      @E@_cmd_config
 decl -hidden bool     @E@_cmd_load
-
-def @E@-stop -params .. %{
-  fail %val{error}
-} -override -hidden
 
 def @E@-0 -params .. %{
   @E@-trpln-land @E@-1__t %arg{@} plug  # <-- terminator
